@@ -1,0 +1,33 @@
+apply plugin: 'groovy'
+
+def defaultEncoding = 'UTF-8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	groovy group : 'org.codehaus.groovy'   , name: 'groovy', version: '1.8.6'
+//	testCompile group:'org.spockframework', name: 'spock-core', version: '0.5-groovy-1.8'
+	testCompile('org.spockframework:spock-core:0.5-groovy-1.8') {
+		exclude module: 'groovy-all'
+	}
+
+}
+[compileJava,compileTestJava,compileGroovy,compileTestGroovy].each{it.options.encoding = defaultEncoding}
+[compileGroovy,compileTestGroovy].each{it.groovyOptions.encoding = defaultEncoding}
+
+
+new File("src/main/groovy").eachFileRecurse { file ->
+	if (file.file && file.name =~ /.*\.groovy/){
+		def taskName = file.path - "src/main/groovy/" - '.groovy'
+		taskName = taskName.replaceAll('/','.')
+		task "$taskName"(type: JavaExec, dependsOn: classes){
+			group = "Run"
+			description = "Run the $taskName program"
+			main = taskName
+			classpath sourceSets.main.output + sourceSets.main.runtimeClasspath
+		}
+	}
+}
+
