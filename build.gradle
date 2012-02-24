@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply plugin: 'java'
 
 def defaultEncoding = 'UTF-8'
 
@@ -17,19 +18,20 @@ dependencies {
 [compileJava,compileTestJava,compileGroovy,compileTestGroovy].each{it.options.encoding = defaultEncoding}
 [compileGroovy,compileTestGroovy].each{it.groovyOptions.encoding = defaultEncoding}
 
+fileTree(dir: 'src/main', includes: ['**/*.java','**/*.groovy']).each {File file ->
+	def path =  relativePath(file.path)	
+	def kind = path.split(/\./).toList().last()
+	def taskName = path - "src/main/${kind}/" - ".${kind}"
+	taskName = taskName.replaceAll('/','.')
+        task "$taskName"(type: JavaExec, dependsOn: classes){
+                   group = "Run"
+                   description = "Run the $taskName program($kind)"
+                   main = taskName
+                   classpath sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
 
-new File("src/main/groovy").eachFileRecurse { file ->
-	if (file.file && file.name =~ /.*\.groovy/){
-		def taskName = file.path - "src/main/groovy/" - '.groovy'
-		taskName = taskName.replaceAll('/','.')
-		task "$taskName"(type: JavaExec, dependsOn: classes){
-			group = "Run"
-			description = "Run the $taskName program"
-			main = taskName
-			classpath sourceSets.main.output + sourceSets.main.runtimeClasspath
-		}
-	}
 }
+	
 
 task makeDirs(description : 'make all dirs for project setup', group: 'Prepare') << {
   def sources = [sourceSets.main, sourceSets.test]
