@@ -5,7 +5,7 @@ class HelloSpock extends spock.lang.Specification {
 
         where:
         name     | length
-        "Spock"  | 4
+        "Spock"  | 5
         "Kirk"   | 4
         "Scotty" | 6
     }
