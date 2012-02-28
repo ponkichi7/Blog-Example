@@ -1,6 +1,8 @@
 apply plugin: 'groovy'
 apply plugin: 'java'
 
+fileTree(dir: 'gradle', includes: ['*.gradle']).each { apply from: it }
+
 def defaultEncoding = 'UTF-8'
 
 repositories {

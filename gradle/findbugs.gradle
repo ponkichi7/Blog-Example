@@ -1,0 +1,48 @@
+configurations {
+    findbugs
+}
+
+dependencies {
+    findbugs "com.google.code.findbugs:findbugs-ant:1.3.9"
+}
+
+findbugsOutputDirName = "findbugs"
+findbugsReportDir     = new File(reportsDir, findbugsOutputDirName)
+findbugsOutputType    = 'xml'
+findbugsJvmargs       = '-Xmx512M'
+
+sourceSets.each { sourceSet ->
+
+    def findbugsTask = task(sourceSet.getTaskName('findbugs', null)) {
+
+        def outputFile = new File(findbugsReportDir, "${sourceSet.name}.${findbugsOutputType}")
+
+        dependsOn sourceSet.classesTaskName
+        inputs.dir sourceSet.classesDir
+        outputs.file outputFile
+
+        doLast {
+
+            ant {
+                taskdef(resource: 'edu/umd/cs/findbugs/anttask/tasks.properties',
+                       classpath: configurations.findbugs.asPath)
+
+                mkdir(dir: findbugsReportDir)
+
+                findbugs(classpath: configurations.findbugs.asPath,
+                        pluginlist: '',
+                            output: findbugsOutputType,
+                        outputFile: outputFile,
+                       failOnError: true,
+                           jvmargs: findbugsJvmargs) {
+
+                    auxClassPath(path: configurations.compile.asPath)
+                    sourceSet.allJava.srcDirs.each { sourcepath(path: it) }
+                    "class"(location: sourceSet.classesDir)
+                }
+            }
+        }
+    }
+
+    tasks['check'].dependsOn findbugsTask
+}
