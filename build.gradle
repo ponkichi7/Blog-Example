@@ -42,3 +42,7 @@ task makeDirs(description : 'make all dirs for project setup', group: 'Prepare')
     srcDir.mkdirs()
   } 
 }
+
+test {
+	outputs.upToDateWhen { false }
+}
