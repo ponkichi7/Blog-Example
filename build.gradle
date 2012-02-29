@@ -1,5 +1,4 @@
-apply plugin: 'groovy'
-apply plugin: 'java'
+apply plugin: 'scala'
 
 fileTree(dir: 'gradle', includes: ['*.gradle']).each { apply from: it }
 
@@ -10,17 +9,12 @@ repositories {
 }
 
 dependencies {
-	groovy group : 'org.codehaus.groovy'   , name: 'groovy', version: '1.8.6'
-//	testCompile group:'org.spockframework', name: 'spock-core', version: '0.5-groovy-1.8'
-	testCompile('org.spockframework:spock-core:0.5-groovy-1.8') {
-		exclude module: 'groovy-all'
-	}
-
+        scalaTools group: 'org.scala-lang', name: 'scala-compiler', version: '2.9.+'
+        scalaTools group: 'org.scala-lang', name: 'scala-library', version: '2.9.+'
+        compile group: 'org.scala-lang', name: 'scala-library', version: '2.9.+'
 }
-[compileJava,compileTestJava,compileGroovy,compileTestGroovy].each{it.options.encoding = defaultEncoding}
-[compileGroovy,compileTestGroovy].each{it.groovyOptions.encoding = defaultEncoding}
 
-fileTree(dir: 'src/main', includes: ['**/*.java','**/*.groovy']).each {File file ->
+fileTree(dir: 'src/main', includes: ['**/*.scala']).each {File file ->
 	def path =  relativePath(file.path)	
 	def kind = path.split(/\./).toList().last()
 	def taskName = path - "src/main/${kind}/" - ".${kind}"
