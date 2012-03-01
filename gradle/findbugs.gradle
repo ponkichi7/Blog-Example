@@ -7,7 +7,7 @@ dependencies {
 }
 
 findbugsOutputDirName = "findbugs"
-findbugsReportDir     = new File(reportsDir, findbugsOutputDirName)
+findbugsReportDir     = new File(reporting.baseDir, findbugsOutputDirName)
 findbugsOutputType    = 'xml'
 findbugsJvmargs       = '-Xmx512M'
 
@@ -18,7 +18,7 @@ sourceSets.each { sourceSet ->
         def outputFile = new File(findbugsReportDir, "${sourceSet.name}.${findbugsOutputType}")
 
         dependsOn sourceSet.classesTaskName
-        inputs.dir sourceSet.classesDir
+        inputs.dir sourceSet.output.classesDir
         outputs.file outputFile
 
         doLast {
@@ -38,7 +38,7 @@ sourceSets.each { sourceSet ->
 
                     auxClassPath(path: configurations.compile.asPath)
                     sourceSet.allJava.srcDirs.each { sourcepath(path: it) }
-                    "class"(location: sourceSet.classesDir)
+                    "class"(location: sourceSet.output.classesDir)
                 }
             }
         }
